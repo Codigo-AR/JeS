@@ -1,0 +1,1 @@
+for (let i = 0; i < document.querySelectorAll('.email').length; i++) { var elem = document.querySelectorAll('.email')[i]; var email1 = 'codigo.arseniy'; var email2 = 'gmail.com'; elem.innerHTML = '<a href="mailto:' + email1 + '@' + email2 + '">' + email1 + '@' + email2 + '<a>'; email1 = undefined; email2 = undefined; elem = undefined; }
