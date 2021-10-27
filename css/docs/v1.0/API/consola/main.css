@@ -1,1 +1,76 @@
+main {
+    display: flex;
+    flex-direction: row;
+    width: 100%
+}
 
+main [col="1"] {
+    min-width: 300px;
+    margin: 10px;
+    margin-right: 20px;
+}
+
+main [col="1"] > ol {
+    padding-left: 0;
+    margin-left: 20px;
+}
+
+main [col="1"] a {
+    color: #cdcdcd;
+    text-decoration: none;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+main [col="1"] a:hover, 
+main [col="1"] a:focus {
+    color: #ffffff;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+main [col="1"] a[no-link] {
+    cursor: not-allowed;
+}
+
+main [col="1"] a[no-link]:hover, 
+main [col="1"] a[no-link]:focus {
+    cursor: not-allowed;
+}
+
+main [col="1"] ol ol li {
+    padding: 5px 0;
+}
+
+main [col="2"] {
+    width: 100%;
+    margin: 10px;
+    margin-left: 20px;
+}
+
+main [col="2"] header h1 {
+    font-size: 48px;
+    margin-top: 0;
+    padding-top: 10px;
+}
+
+main [col="2"] bdo h2,
+main [col="2"] bdo h3 {
+    font-size: 20px;
+}
+
+main [col="2"] bdo code {
+    background: #535353;
+    padding: 0 2px;
+    border-radius: 1px;
+}
+
+main [col="2"] bdo code::selection {
+    background-color: #ffffff;
+    color: #000000;
+}
+
+main footer [col="2"] {
+    display: flex;
+    align-items: center;
+}
