@@ -19,10 +19,9 @@ var documento = document;
 function JeSpañol() {
     return version;
 }
-var Violation = true
+window.Violation = true
 if (Violation == false) {
-    window.delete(Violation)
-
+    delete window.Violation
 }
 
 if (typeof ethereum !== "undefined" && typeof ethereum.autoRefreshOnNetworkChange !== "undefined") {
@@ -238,7 +237,7 @@ function EventoTecla(CódigoTecla, funcionQueEjecutaLaTecla) {
 
 // JeSpañol
 
-var tipoDe = (variable = () => { }) => {
+var tipoDe = (variable) => {
     if (typeof variable == "boolean") {
         return "booleano"
     } else if (typeof variable == "function") {
@@ -257,41 +256,78 @@ var tipoDe = (variable = () => { }) => {
         return "ventana"
     } else if (typeof variable == "object") {
         return "objeto"
+    } else {
+        return "función"
     }
 }
 
 var JeS = (selector) => {
-    if (tipoDe(selector) == "función") {
-        window.onunload = selector(window, documento)
-    } else if (existe(selector)) {
-        return new JeS.fn.str(selector)
+    if (tipoDe(selector) == 'cadena' || selector == document) {
+        if (tipoDe(selector) == 'cadena' || tipoDe(selector) == 'objeto' || selector == documento) {
+            return new JeS.fn.str(selector)
+        }
     } else if (selector == null || selector == "") {
         throw new TypeError('No se pudo ejecutar \'JeS\' en \'Window\': se requiere 1 argumento, pero solo hay 0 presente');
+    } else if (tipoDe(selector) == "función") {
+        window.onunload = selector(window, documento)
     }
 }
 
 JeS.fn = JeS.__proto__ = {
     str: class {
-        constructor(selector) {
-            var elems = document.querySelectorAll(selector)
-            if (elems.length == 0) {
-                this.length = 0
-                this.selector = ""
-                this.JeSpañol = version
-            } else {
-                var n = 1
-                for (let i = 0; i < elems.length; i++) {
-                    const elem = elems[i];
-                    this[i] = elem
-                    this.length = n++
+        constructor(selector, crE = null) {
+            if (tipoDe(selector) == 'cadena') {
+                var elems = document.querySelectorAll(selector)
+                if (elems.length == 0) {
+                    this.length = 0
+                    this.selector = ""
+                    this.JeSpañol = JeSpañol
+                } else {
+                    var n = 1
+                    for (let i = 0; i < elems.length; i++) {
+                        const elem = elems[i];
+                        this[i] = elem
+                        this.length = n++
+                    }
+                    this.selector = selector
+                    this.JeSpañol = version
                 }
-                this.selector = selector
-                this.JeSpañol = version
+            } else if (selector == documento) {
+                var n = 1
+                this[0] = selector
+                this.length = n++
+                this.selector = 'documento'
+                this.JeSpañol = JeSpañol
+            } else if (tipoDe(selector) == 'objeto') {
+                if (crE !== null) {
+                    var n = 1
+                    this[0] = selector
+                    this.length = n++
+                    this.selector = selector.nodeName.toLowerCase()
+                    this.JeSpañol = JeSpañol
+                }
             }
+
+            if (this.length == 1 && this.selector !== documento) {
+                this.__proto__.id = (id) => {
+                    this[0].id = id
+                    return this
+                }
+            }
+
+            delete this.__proto__.constructor
         }
 
         añadir(selector) {
-            if (tipoDe(selector) == 'objeto') {
+            if (selector == documento) {
+                const elem = selector;
+                var n = this.length
+                this[n] = elem
+                n++
+                this.length = n
+                delete this.__proto__.id
+                return this
+            } else if (tipoDe(selector) == 'objeto') {
                 for (let i = 0; i < selector.length; i++) {
                     const elem = selector[i];
                     var n = this.length
@@ -299,6 +335,7 @@ JeS.fn = JeS.__proto__ = {
                     n++
                     this.length = n
                 }
+                delete this.__proto__.id
                 return this
             } else if (tipoDe(selector) == 'cadena') {
                 var elems = document.querySelectorAll(selector)
@@ -308,35 +345,41 @@ JeS.fn = JeS.__proto__ = {
                     n++
                     this.length = n
                 }
+                delete this.__proto__.id
                 return this
             }
         }
 
         añadirClase(...clases) {
             for (var i = 0; i < this.length; i++) {
-                this[i].classList.add(...clases)
+                if (tipoDe(this[i].classList) !== 'indefinido') {
+                    this[i].classList.add(...clases)
+                }
             }
             return this
         }
 
-        añadirHijo(elemento, posición) {
+        añadirHijo(elemento, posición = null) {
             if (tipoDe(elemento) == "cadena" && elemento.includes('<')) {
                 for (var i = 0; i < this.length; i++) {
-                    if (posición == "primero" || posición == "antes" || posición == 1 || posición == "1" || posición == "1º") {
-                        this[i].insertAdjacentHTML('afterbegin', elemento);
-                    } else {
-                        this[i].insertAdjacentHTML('beforeend', elemento);
+                    if (tipoDe(this[i].insertAdjacentHTML) !== 'indefinido') {
+                        if (posición == "primero" || posición == "antes" || posición == 1 || posición == "1" || posición == "1º") {
+                            this[i].insertAdjacentHTML('afterbegin', elemento);
+                        } else {
+                            this[i].insertAdjacentHTML('beforeend', elemento);
+                        }
                     }
                 }
                 return this
             } else if (tipoDe(elemento) == "objeto") {
-                var n = 1;
                 for (var i = 0; i < this.length; i++) {
-                    if (posición == "primero" || posición == "antes" || posición == 1 || posición == "1" || posición == "1º") {
-                        this[i].parentNode.insertBefore(elemento, this[0]);
-                    } else {
-                        this[i].parentNode.insertBefore(elemento, this[n]);
-                        n++
+                    if (tipoDe(this[i].insertBefore) !== 'indefinido' && tipoDe(this[i].appendChild) !== 'indefinido') {
+                        if (posición !== 'último' && tipoDe(posición) == 'número') {
+                            var posicion = (posición - 1)
+                            this[i].insertBefore(elemento[0], this[i].children[posicion]);
+                        } else {
+                            this[i].appendChild(elemento[0])
+                        }
                     }
                 }
                 return this
@@ -350,7 +393,9 @@ JeS.fn = JeS.__proto__ = {
                 throw new TypeError('No se pudo ejecutar \'añadirEvento\' en \'JeS\': se requiere una función en el segundo argumento')
             } else {
                 for (var i = 0; i < this.length; i++) {
-                    this[i].addEventListener(tipo, evento)
+                    if (tipoDe(this[i].addEventListener) !== 'indefinido') {
+                        this[i].addEventListener(tipo, evento)
+                    }
                 }
                 return this
             }
@@ -359,12 +404,16 @@ JeS.fn = JeS.__proto__ = {
         después(elemento) {
             if (tipoDe(elemento) == "cadena" && elemento.includes('<')) {
                 for (var i = 0; i < this.length; i++) {
-                    this[i].insertAdjacentHTML('afterend', elemento);
+                    if (tipoDe(this[i].insertAdjacentHTML) !== 'indefinido') {
+                        this[i].insertAdjacentHTML('afterend', elemento);
+                    }
                 }
                 return this
             } else if (tipoDe(elemento) == "objeto") {
                 for (var i = 0; i < this.length; i++) {
-                    this[i].parentNode.insertBefore(elemento, this[i].nextSibling);
+                    if (tipoDe(this[i].insertAdjacentHTML.parentNode.insertBefore) !== 'indefinido') {
+                        this[i].parentNode.insertBefore(elemento, this[i].nextSibling);
+                    }
                 }
                 return this
             }
@@ -373,12 +422,16 @@ JeS.fn = JeS.__proto__ = {
         antes(elemento) {
             if (tipoDe(elemento) == "cadena" && elemento.includes('<')) {
                 for (var i = 0; i < this.length; i++) {
-                    this[i].insertAdjacentHTML('beforebegin', elemento);
+                    if (tipoDe(this[i].insertAdjacentHTML) !== 'indefinido') {
+                        this[i].insertAdjacentHTML('beforebegin', elemento);
+                    }
                 }
                 return this
             } else if (tipoDe(elemento) == "objeto") {
                 for (var i = 0; i < this.length; i++) {
-                    this[i].parentNode.insertBefore(elemento, this[i]);
+                    if (tipoDe(this[i].insertAdjacentHTML.parentNode.insertBefore) !== 'indefinido') {
+                        this[i].parentNode.insertBefore(elemento, this[i]);
+                    }
                 }
                 return this
             }
@@ -386,14 +439,18 @@ JeS.fn = JeS.__proto__ = {
 
         atr(nombre, valor) {
             for (var i = 0; i < this.length; i++) {
-                this[i].setAttribute(nombre, valor)
+                if (tipoDe(this[i].setAttribute) !== 'indefinido') {
+                    this[i].setAttribute(nombre, valor)
+                }
             }
             return this
         }
 
         atrRemover(nombre) {
             for (var i = 0; i < this.length; i++) {
-                this[i].removeAttribute(nombre)
+                if (tipoDe(this[i].removeAttribute) !== 'indefinido') {
+                    this[i].removeAttribute(nombre)
+                }
             }
             return this
         }
@@ -403,7 +460,9 @@ JeS.fn = JeS.__proto__ = {
                 this[0].focus()
                 return this
             } else if (tipoDe(función) == "función") {
-                this[0].addEventListener("focus", función)
+                for (let i = 0; i < this.length; i++) {
+                    this[i].addEventListener("focus", función)
+                }
             }
         }
 
@@ -412,44 +471,38 @@ JeS.fn = JeS.__proto__ = {
                 this[0].blur()
                 return this
             } else if (tipoDe(función) == "función") {
-                this[0].addEventListener("blur", función)
+                for (let i = 0; i < this.length; i++) {
+                    this[i].addEventListener("blur", función)
+                }
             }
         }
-    },
-    createElem: class {
-        constructor(nodeElem) {
-            this[0] = nodeElem
-            this.title = nodeElem.title
-            this.html = nodeElem.innerHTML
-            this.texto = nodeElem.textContent
-            this.JeSpañol = JeSpañol
-        }
 
-        añadirClase(...clases) {
+        HTML(html) {
             for (var i = 0; i < this.length; i++) {
-                this[i].classList.add(...clases)
+                if (tipoDe(this[i].innerHTML) !== 'indefinido') {
+                    this[i].innerHTML = html
+                }
             }
             return this
         }
 
-        añadirHijo(elemento, posición) {
-            if (tipoDe(elemento) == "cadena" && elemento.includes('<')) {
-                for (var i = 0; i < this.length; i++) {
-                    if (posición == "primero" || posición == "antes" || posición == 1 || posición == "1" || posición == "1º") {
-                        this[i].insertAdjacentHTML('afterbegin', elemento);
-                    } else {
-                        this[i].insertAdjacentHTML('beforeend', elemento);
-                    }
+        Texto(Texto) {
+            for (var i = 0; i < this.length; i++) {
+                if (tipoDe(this[i].innerText) !== 'indefinido') {
+                    this[i].innerText = Texto
                 }
-                return this
-            } else if (tipoDe(elemento) == "objeto") {
-                var n = 1;
+            }
+            return this
+        }
+
+        CSS (...css) {
+            if (tipoDe(...css) == 'cadena') {
                 for (var i = 0; i < this.length; i++) {
-                    if (posición == "primero" || posición == "antes" || posición == 1 || posición == "1" || posición == "1º") {
-                        this[i].parentNode.insertBefore(elemento, this[0]);
-                    } else {
-                        this[i].parentNode.insertBefore(elemento, this[n]);
-                        n++
+                    for (let a = 0; a < css.length; a++) {
+                        if (tipoDe(this[i].setAttribute) !== 'indefinido' && css[a].search(':') !== -1) {
+                            this[i].setAttribute('style', css.join('; '))
+                            consola.mostrar(...css)
+                        }
                     }
                 }
                 return this
@@ -457,22 +510,36 @@ JeS.fn = JeS.__proto__ = {
         }
     }
 }
-
-JeS.crearElemento = (nombre, contenido = "", HTML_o_Texto) => {
-    if (nombre == null) {
+var nombreId
+JeS.crearElemento = (nombreId, contenido = "", HTML_o_Texto) => {
+    if (nombreId == null) {
         throw new TypeError('No se pudo ejecutar \'crearElemento\' en \'JeS\': se requiere 1 argumento, pero solo hay 0 presente')
     } else if (contenido !== "" && HTML_o_Texto == null) {
         throw new TypeError('No se pudo ejecutar \'crearElemento\' en \'JeS\': se requieren 2 argumentos, pero solo hay 1 presente');
     } else {
-        var elem = document.createElement(nombre)
-        if (HTML_o_Texto == "HTML") {
-            elem.innerHTML = contenido
-            return new JeS.fn.createElem(elem)
-        } else if (HTML_o_Texto == "Texto") {
-            elem.textContent = contenido
-            return new JeS.fn.createElem(elem)
+        var nombre,id
+        if (nombreId.search(',') !== -1) {
+            nombreID = nombreId.split(',')
+            nombre = nombreID[0]
+            id = nombreID[1]
         } else {
-            return new JeS.fn.createElem(elem)
+            nombre = nombreId
+            id = ""
+        }
+        if (HTML_o_Texto == 'HTML') {
+            var Je = document.createElement(nombre)
+            Je.innerHTML = contenido
+            Je.id = id
+            return new JeS.fn.str(Je, 'crE')
+        } else if (HTML_o_Texto == 'Texto' || HTML_o_Texto == null) {
+            var Je = document.createElement(nombre)
+            Je.innerText = contenido
+            Je.id = id
+            return new JeS.fn.str(Je, 'crE')
+        } else {
+            var Je = document.createElement(nombre)
+            Je.id = id
+            return new JeS.fn.str(Je, 'crE')
         }
     }
 }
