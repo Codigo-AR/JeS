@@ -262,10 +262,8 @@ var tipoDe = (variable) => {
 }
 
 var JeS = (selector) => {
-    if (tipoDe(selector) == 'cadena' || selector == document) {
-        if (tipoDe(selector) == 'cadena' || tipoDe(selector) == 'objeto' || selector == documento) {
-            return new JeS.fn.str(selector)
-        }
+    if (tipoDe(selector) == 'cadena' || tipoDe(selector) == 'objeto' || selector == document) {
+        return new JeS.fn.str(selector)
     } else if (selector == null || selector == "") {
         throw new TypeError('No se pudo ejecutar \'JeS\' en \'Window\': se requiere 1 argumento, pero solo hay 0 presente');
     } else if (tipoDe(selector) == "función") {
@@ -290,7 +288,7 @@ JeS.fn = JeS.__proto__ = {
                         this.length = n++
                     }
                     this.selector = selector
-                    this.JeSpañol = version
+                    this.JeSpañol = JeSpañol
                 }
             } else if (selector == documento) {
                 var n = 1
@@ -300,6 +298,12 @@ JeS.fn = JeS.__proto__ = {
                 this.JeSpañol = JeSpañol
             } else if (tipoDe(selector) == 'objeto') {
                 if (crE !== null) {
+                    var n = 1
+                    this[0] = selector
+                    this.length = n++
+                    this.selector = selector.nodeName.toLowerCase()
+                    this.JeSpañol = JeSpañol
+                } else {
                     var n = 1
                     this[0] = selector
                     this.length = n++
@@ -328,12 +332,21 @@ JeS.fn = JeS.__proto__ = {
                 delete this.__proto__.id
                 return this
             } else if (tipoDe(selector) == 'objeto') {
-                for (let i = 0; i < selector.length; i++) {
-                    const elem = selector[i];
+                if (Array.isArray(selector)) {
+                    for (let i = 0; i < selector.length; i++) {
+                        const elem = selector[i];
+                        var n = this.length
+                        this[n] = elem
+                        n++
+                        this.length = n
+                    }
+                } else {
                     var n = this.length
-                    this[n] = elem
+                    this[n] = selector
                     n++
                     this.length = n
+                    this.selector = selector.nodeName.toLowerCase()
+                    this.JeSpañol = JeSpañol
                 }
                 delete this.__proto__.id
                 return this
@@ -495,7 +508,7 @@ JeS.fn = JeS.__proto__ = {
             return this
         }
 
-        CSS (...css) {
+        CSS(...css) {
             if (tipoDe(...css) == 'cadena') {
                 for (var i = 0; i < this.length; i++) {
                     for (let a = 0; a < css.length; a++) {
@@ -517,7 +530,7 @@ JeS.crearElemento = (nombreId, contenido = "", HTML_o_Texto) => {
     } else if (contenido !== "" && HTML_o_Texto == null) {
         throw new TypeError('No se pudo ejecutar \'crearElemento\' en \'JeS\': se requieren 2 argumentos, pero solo hay 1 presente');
     } else {
-        var nombre,id
+        var nombre, id
         if (nombreId.search(',') !== -1) {
             nombreID = nombreId.split(',')
             nombre = nombreID[0]
